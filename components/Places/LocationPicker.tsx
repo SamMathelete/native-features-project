@@ -1,4 +1,4 @@
-import { FC, useState } from "react";
+import { FC, useEffect, useState } from "react";
 import { Alert, Image, StyleSheet, Text, View } from "react-native";
 import { Colors } from "../../constants/colors";
 import OutlinedButton from "../UI/OutlinedButton";
@@ -8,14 +8,49 @@ import {
   useForegroundPermissions,
 } from "expo-location";
 import { getMapPreview } from "../../helpers/location";
+import {
+  RouteProp,
+  useIsFocused,
+  useNavigation,
+  useRoute,
+} from "@react-navigation/native";
+import { NativeStackNavigationProp } from "@react-navigation/native-stack";
+import { latlng } from "../../screens/Map";
 
 interface Location {
   lat: number;
   lon: number;
 }
 
-const LocationPicker: FC = () => {
+type RootParamList = {
+  Map: undefined;
+  AddPlace: Location;
+};
+
+interface Props {
+  onPickLocation: (location: latlng) => void;
+}
+
+const LocationPicker: FC<Props> = ({ onPickLocation }) => {
+  const navigation = useNavigation<NativeStackNavigationProp<RootParamList>>();
+  const route = useRoute<RouteProp<RootParamList>>();
+
+  const isFocused = useIsFocused();
   const [pickedLocation, setPickedLocation] = useState<Location | null>(null);
+
+  useEffect(() => {
+    if (isFocused && route.params) {
+      const mapPickedLocation = {
+        lat: route.params.lat,
+        lon: route.params.lon,
+      };
+      setPickedLocation(mapPickedLocation);
+    }
+  }, [route, isFocused]);
+
+  useEffect(() => {
+    onPickLocation(pickedLocation!);
+  }, [pickedLocation, onPickLocation]);
 
   const [locationPermissionInfo, requestPermission] =
     useForegroundPermissions();
@@ -45,7 +80,9 @@ const LocationPicker: FC = () => {
     });
   };
 
-  const pickOnMapHandler = () => {};
+  const pickOnMapHandler = () => {
+    navigation.navigate("Map");
+  };
 
   let locationPreview = <Text>No Location Picked Yet.</Text>;
   if (pickedLocation) {

@@ -8,7 +8,11 @@ import {
 import { Colors } from "../../constants/colors";
 import OutlinedButton from "../UI/OutlinedButton";
 
-const ImagePicker: FC = () => {
+interface Props {
+  onTakeImage: (imageUri: string) => void;
+}
+
+const ImagePicker: FC<Props> = ({ onTakeImage }) => {
   const [image, setImage] = useState<string | null>(null);
 
   const [cameraPermissionInfo, requestPermission] = useCameraPermissions();
@@ -39,6 +43,7 @@ const ImagePicker: FC = () => {
       quality: 0.5,
     });
     setImage(image.assets![0].uri);
+    onTakeImage(image.assets![0].uri);
   };
 
   let imagePicked = <Text>No Image taken yet.</Text>;
