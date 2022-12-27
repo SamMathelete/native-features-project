@@ -23,7 +23,11 @@ interface Location {
 }
 
 type RootParamList = {
-  Map: undefined;
+  Map: {
+    lat: number;
+    lon: number;
+    readOnly: boolean;
+  };
   AddPlace: Location;
 };
 
@@ -81,7 +85,11 @@ const LocationPicker: FC<Props> = ({ onPickLocation }) => {
   };
 
   const pickOnMapHandler = () => {
-    navigation.navigate("Map");
+    navigation.navigate("Map", {
+      lat: 0,
+      lon: 0,
+      readOnly: false,
+    });
   };
 
   let locationPreview = <Text>No Location Picked Yet.</Text>;

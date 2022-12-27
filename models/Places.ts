@@ -11,11 +11,16 @@ export class Place {
     longitude: 0.0,
   };
   id: string = "";
-  constructor(title: string, imageUri: string, location: location) {
+  constructor(
+    title: string,
+    imageUri: string,
+    location: location,
+    id?: string
+  ) {
     this.title = title;
     this.imageUri = imageUri;
     this.location = location;
-    this.id = new Date().toString() + Math.random().toString();
+    this.id = id ? id : "0";
   }
 }
 

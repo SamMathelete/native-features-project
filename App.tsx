@@ -7,16 +7,40 @@ import IconButton from "./components/UI/IconButton";
 import { Colors } from "./constants/colors";
 import Map, { latlng } from "./screens/Map";
 import Place from "./models/Places";
+import { useEffect, useState } from "react";
+import { init } from "./helpers/database";
+import * as SplashScreen from "expo-splash-screen";
+import PlaceDetails from "./screens/PlaceDetails";
+
+SplashScreen.preventAutoHideAsync();
 
 type RootParamsList = {
-  AllPlaces: Place;
+  AllPlaces: undefined;
   AddPlace: latlng;
-  Map: undefined;
+  Map: {
+    lat: number;
+    lon: number;
+    readOnly: boolean;
+  };
+  PlaceDetails: {
+    id: string;
+  };
 };
 
 const Stack = createNativeStackNavigator<RootParamsList>();
 
 export default function App() {
+  const [dbInitialised, setDbInitialised] = useState<boolean>(false);
+  if (dbInitialised) {
+    SplashScreen.hideAsync();
+  }
+  useEffect(() => {
+    init()
+      .then(() => {
+        setDbInitialised(true);
+      })
+      .catch((err) => console.log(err));
+  }, []);
   return (
     <>
       <StatusBar style="dark" />
@@ -55,6 +79,7 @@ export default function App() {
             }}
           />
           <Stack.Screen name="Map" component={Map} />
+          <Stack.Screen name="PlaceDetails" component={PlaceDetails} />
         </Stack.Navigator>
       </NavigationContainer>
     </>

@@ -1,15 +1,29 @@
+import { useNavigation } from "@react-navigation/native";
+import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import { FC } from "react";
 import { FlatList, StyleSheet, Text, View } from "react-native";
 import { Colors } from "../../constants/colors";
 import Place from "../../models/Places";
 import PlaceItem from "./PlaceItem";
 
+type RootParamList = {
+  PlaceDetails: {
+    id: string;
+  };
+};
+
 interface Props {
   places: Place[];
 }
 
 const PlacesList: FC<Props> = ({ places }) => {
-  const placeSelectHandler = () => {};
+  const navigation = useNavigation<NativeStackNavigationProp<RootParamList>>();
+
+  const placeSelectHandler = (id: string) => {
+    navigation.navigate("PlaceDetails", {
+      id: id,
+    });
+  };
 
   if (!places || places.length === 0) {
     return (

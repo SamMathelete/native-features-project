@@ -1,3 +1,4 @@
+import { TabRouter } from "@react-navigation/native";
 import { NativeStackScreenProps } from "@react-navigation/native-stack";
 import { FC, useCallback, useLayoutEffect, useState } from "react";
 import { Alert, StyleSheet } from "react-native";
@@ -10,23 +11,34 @@ export interface latlng {
 }
 
 type RootParamList = {
-  Map: undefined;
+  Map: {
+    lat: number;
+    lon: number;
+    readOnly: boolean;
+  };
   AddPlace: latlng;
 };
 
 type Props = NativeStackScreenProps<RootParamList, "Map">;
 
-const Map: FC<Props> = ({ navigation }) => {
-  const [selectedLocation, setSelectedLocation] = useState<latlng | null>(null);
+const Map: FC<Props> = ({ navigation, route }) => {
+  const initialLocation = {
+    lat: route.params.lat,
+    lon: route.params.lon,
+  };
+
+  const [selectedLocation, setSelectedLocation] =
+    useState<latlng>(initialLocation);
 
   const region = {
-    latitude: 37.78,
-    longitude: -122.43,
+    latitude: initialLocation.lat,
+    longitude: initialLocation.lon,
     latitudeDelta: 0.0922,
     longitudeDelta: 0.0421,
   };
 
   const selectLocationHandler = (event: MapPressEvent) => {
+    if (route.params.readOnly) return;
     const lat = event.nativeEvent.coordinate.latitude;
     const lon = event.nativeEvent.coordinate.longitude;
     setSelectedLocation({
@@ -44,6 +56,7 @@ const Map: FC<Props> = ({ navigation }) => {
   }, [selectedLocation]);
 
   useLayoutEffect(() => {
+    if (route.params.readOnly) return;
     navigation.setOptions({
       headerRight: ({ tintColor }) => {
         return (
